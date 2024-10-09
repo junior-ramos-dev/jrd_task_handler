@@ -24,6 +24,6 @@
     "require": ["tsconfig-paths/register"]
   },
   "exclude": [
-    "node_modues"
+    "node_modues", "jest.config.ts",
   ]
 }
