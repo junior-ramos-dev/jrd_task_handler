@@ -1,4 +1,4 @@
-import { remapObj } from "./TaskHandler";
+import { remapObj } from "../../core/modules/TaskHandler";
 
 describe("remapObj", () => {
   it("should return a new object with the same keys and values", () => {

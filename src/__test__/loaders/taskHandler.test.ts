@@ -1,14 +1,13 @@
-import { Task } from "../modules/Task";
+import { taskHandler } from "../../core/loaders/taskHandler";
+import { Task } from "../../core/modules/Task";
 import {
   execTaskBySpecObject,
   getTaskSpecByIndex,
   setCacheData,
   TASK,
-} from "../modules/TaskHandlerSpecs";
+} from "../../core/modules/TaskHandlerSpecs";
 
-import { taskHandler } from "./taskHandler";
-
-jest.mock("../modules/TaskHandlerSpecs", () => ({
+jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
   execTaskBySpecObject: jest.fn(),
   getCachedData: jest.fn(),
   getTaskSpecByIndex: jest.fn(),

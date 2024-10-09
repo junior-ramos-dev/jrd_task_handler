@@ -1,4 +1,4 @@
-import { ITask, ITaskError, Task } from "./Task";
+import { ITask, ITaskError, Task } from "../../core/modules/Task";
 
 describe("Task Class", () => {
   let task: Task;

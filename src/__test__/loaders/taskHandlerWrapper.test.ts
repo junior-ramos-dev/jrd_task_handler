@@ -1,8 +1,10 @@
 import { Response } from "express";
 
-import { ITaskHandlerSpecs } from "@/core/modules/TaskHandlerSpecs";
-
-import { handleResponse, taskHandlerWrapper } from "./taskHandlerWrapper";
+import {
+  handleResponse,
+  taskHandlerWrapper,
+} from "../../core/loaders/taskHandlerWrapper";
+import { ITaskHandlerSpecs } from "../../core/modules/TaskHandlerSpecs";
 
 describe("taskHandlerWrapper", () => {
   it("should call taskHandler with remapped arguments and return response", async () => {

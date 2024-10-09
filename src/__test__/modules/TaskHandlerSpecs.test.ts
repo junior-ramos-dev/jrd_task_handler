@@ -6,7 +6,7 @@ import {
   ITaskHandlerSpecs,
   logTask,
   setCacheData,
-} from "./TaskHandlerSpecs";
+} from "../../core/modules/TaskHandlerSpecs";
 
 describe("Task Handling Functions", () => {
   let taskHandlerItemSpecsList: ITaskHandlerSpecs[];
