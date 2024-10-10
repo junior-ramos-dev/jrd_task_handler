@@ -1,14 +1,13 @@
 import { Response } from "express";
 
-import { IObjectMap, ITask } from "@/core/modules/Task";
-import { ITaskHandlerSpecs } from "@/core/modules/TaskHandlerSpecs";
-
+import { IObjectMap, ITask } from "../modules/Task";
 import {
   remapObj,
   TaskHandler,
   TaskHandlerWrapper,
   TaskRequestArgs,
 } from "../modules/TaskHandler";
+import { ITaskHandlerSpecs } from "../modules/TaskHandlerSpecs";
 
 export const taskHandlerWrapper: TaskHandlerWrapper = async (
   taskHandler: TaskHandler,

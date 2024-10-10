@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IObjectMap, ITask } from "@/core/modules/Task";
-
+import { IObjectMap, ITask } from "./Task";
 import { ITaskHandlerSpecs } from "./TaskHandlerSpecs";
 
 /**
