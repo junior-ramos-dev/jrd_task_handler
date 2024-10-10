@@ -1,4 +1,4 @@
-# Task Load Handler
+# Task Handler
 
 ## Overview
 
@@ -29,7 +29,9 @@ This helper function handles the execution of tasks except for the final task:
 
 - Verifies if the current task should be logged and is ready to run.
 - Executes the task using `execTaskBySpecObject` and caches its output if needed.
-- Updates the `index`, `taskId`, and `runTask` flags to progress the task sequence.
+- Updates the `cachedData`, `index`, `taskId`, and `runTask` flags to progress the task sequence.
+- #### Note:
+   At this point, the response will always include an empty object for `data` and an object for `error` (the properties will be empty if there are no errors) and the ID for the current task being executed. If no errors occur during the process, the final task will return the resulting data.
 
 ### 3. `getTaskArgs` Function
 
@@ -136,7 +138,7 @@ This utility function is likely designed to wrap the core task execution (`taskH
 
 ### 3. Task Specification: `registerTasksSpecsList`
 
-This is an imported list of task specifications (`registerTasksSpecsList`), which outlines what tasks should be executed, in what order, and with what configurations.
+This is a list of the task specifications (`registerTasksSpecsList`), which outlines what tasks should be executed, in what order, and with what configurations.
 
 
 Structured overview of the properties from Task Specification, outlining their purposes.
@@ -169,12 +171,7 @@ Structured overview of the properties from Task Specification, outlining their p
 |------------|-----------|-------------------------------------------------------------------------------------------|
 | `cacheData`| `boolean` | A boolean indicating if the task's return data should be cached for later use by other tasks. |
 
-### ICacheData
-
-| Property | Type  | Description                                                                            |
-|----------|-------|----------------------------------------------------------------------------------------|
-| `taskId` | `number` | The ID of the task whose data is being cached.                                        |
-| `data`   | `any` | The actual data to be cached from the task execution, which can be of any type.         | 
+##
 
 ### 4. `handleResponse`
 
