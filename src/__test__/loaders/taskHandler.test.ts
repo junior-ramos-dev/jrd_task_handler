@@ -1,4 +1,5 @@
 import { taskHandler } from "../../core/loaders/taskHandler";
+import { TaskRequestArgs } from "../../core/modules/TaskHandler";
 import {
   execTaskBySpecObject,
   getCachedData,
@@ -7,6 +8,8 @@ import {
   logTask,
   setCacheData,
 } from "../../core/modules/TaskHandlerSpecs";
+
+import "@types/jest";
 
 // Mocking the dependencies
 jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
@@ -91,7 +94,7 @@ describe("taskHandler", () => {
 
     const response = await taskHandler(taskRequestArgs, tasksSpecsList);
 
-    expect(response.error).toEqual({
+    expect(response!.error).toEqual({
       status: 400,
       name: "TypeError",
       message: "Cannot read properties of undefined (reading 'requestArgs')",
