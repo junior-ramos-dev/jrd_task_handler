@@ -25,7 +25,7 @@ export type AsyncTask = (...args: any) => Promise<any>;
 /**
  * Define if the task use args from the initial request
  */
-interface IRequestArgs {
+export interface IRequestArgs {
   // Define the args keys from initial request
   requestArgsKeys: string[];
 }
@@ -33,7 +33,7 @@ interface IRequestArgs {
 /**
  * Define if current task uses data returned from the previous task as args
  */
-interface IPreviousTaskDataArgs {
+export interface IPreviousTaskDataArgs {
   // Define the id from which previous task data is used by current task
   prevTaskId: number;
   // Define the args keys from previous task data
@@ -43,7 +43,7 @@ interface IPreviousTaskDataArgs {
 /**
  * Define if task return data;
  */
-interface ITaskReturnData {
+export interface ITaskReturnData {
   // Define if the returned data must be cached to use by next tasks;
   cacheData: boolean;
 }

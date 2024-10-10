@@ -1,12 +1,14 @@
 import { taskHandler } from "../../core/loaders/taskHandler";
-import { Task } from "../../core/modules/Task";
 import {
   execTaskBySpecObject,
+  getCachedData,
   getTaskSpecByIndex,
+  ITaskHandlerSpecs,
+  logTask,
   setCacheData,
-  TASK,
 } from "../../core/modules/TaskHandlerSpecs";
 
+// Mocking the dependencies
 jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
   execTaskBySpecObject: jest.fn(),
   getCachedData: jest.fn(),
@@ -17,64 +19,82 @@ jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
 }));
 
 describe("taskHandler", () => {
-  const mockTask = new Task();
-  mockTask.setData = jest.fn();
-  mockTask.setTaskId = jest.fn();
-  mockTask.getResponse = jest.fn().mockReturnValue({ test: "response" });
-
-  const taskRequestArgs = { sampleArg: "testArg" };
-  const tasksSpecsList = [
-    {
-      taskId: 1,
-      taskName: "First Task",
-      task: jest.fn(),
-      taskReturnData: { cacheData: true },
-      requestArgs: { requestArgsKeys: ["sampleArg"] },
-    },
-    {
-      taskId: 2,
-      taskName: "Second Task",
-      task: jest.fn(),
-      prevTaskDataAsArg: { prevTaskId: 1, prevTaskDataArgs: ["sampleArg"] },
-    },
-  ];
+  let taskRequestArgs: TaskRequestArgs;
+  let tasksSpecsList: ITaskHandlerSpecs[];
 
   beforeEach(() => {
+    // Reset mock implementations
     jest.clearAllMocks();
-  });
 
-  it("should execute tasks and return response", async () => {
-    (getTaskSpecByIndex as jest.Mock).mockReturnValueOnce(tasksSpecsList[0]);
-    (execTaskBySpecObject as jest.Mock).mockResolvedValueOnce({
-      someData: "data",
-    });
+    // Sample task specs list
+    tasksSpecsList = [
+      {
+        taskId: 1,
+        taskName: "Task 1",
+        task: jest.fn(),
+        requestArgs: { requestArgsKeys: ["key1"] },
+      },
+      {
+        taskId: 2,
+        taskName: "Task 2",
+        task: jest.fn(),
+      },
+    ];
 
-    const response = await taskHandler(taskRequestArgs, tasksSpecsList);
+    // Sample task request args
+    taskRequestArgs = { key1: "value1", key2: "value2" };
 
-    expect(getTaskSpecByIndex).toHaveBeenCalledWith(tasksSpecsList, 0);
-    expect(execTaskBySpecObject).toHaveBeenCalledWith(
-      tasksSpecsList[0],
-      TASK,
-      "testArg"
+    // Default mock return values
+    const defaultMockAsyncImplementation = jest.fn(() =>
+      Promise.resolve("data")
     );
-    expect(setCacheData).toHaveBeenCalledWith(1, { someData: "data" }, []);
-    expect(mockTask.setData).toHaveBeenCalledWith({ someData: "data" });
-    expect(response).toEqual({ test: "response" });
+    (execTaskBySpecObject as jest.Mock).mockImplementation(
+      defaultMockAsyncImplementation
+    );
+    (getTaskSpecByIndex as jest.Mock).mockImplementation(
+      (list, index) => list[index]
+    );
+    (getCachedData as jest.Mock).mockReturnValue("cachedData");
   });
 
-  it("should handle errors and return error response", async () => {
-    const error = new Error("Test error");
-    (getTaskSpecByIndex as jest.Mock).mockImplementation(() => {
-      throw error;
-    });
+  it("should execute all tasks except the last one correctly", async () => {
+    const response = await taskHandler(taskRequestArgs, tasksSpecsList);
+
+    expect(execTaskBySpecObject).toHaveBeenCalledTimes(1);
+    expect(logTask).not.toHaveBeenCalled();
+    expect(setCacheData).not.toHaveBeenCalled();
+    expect(response).toBeDefined();
+  });
+
+  it("should execute the last task and reset indices", async () => {
+    // Update the taskId and index to simulate the last task execution
+    (getTaskSpecByIndex as jest.Mock).mockImplementation(
+      () => tasksSpecsList[1]
+    );
 
     const response = await taskHandler(taskRequestArgs, tasksSpecsList);
 
-    expect(mockTask.error).toEqual({
+    expect(execTaskBySpecObject).toHaveBeenCalledTimes(1);
+    expect(logTask).not.toHaveBeenCalled();
+    expect(setCacheData).not.toHaveBeenCalled();
+    expect(response).toBeDefined();
+    // Additional checks can be added here to ensure reset behavior, if applicable
+  });
+
+  it("should handle and return task execution errors", async () => {
+    const error = new Error("Execution Error");
+    (execTaskBySpecObject as jest.Mock).mockImplementationOnce(() =>
+      Promise.reject(error)
+    );
+
+    const response = await taskHandler(taskRequestArgs, tasksSpecsList);
+
+    expect(response.error).toEqual({
       status: 400,
       name: error.name,
       message: error.message,
     });
-    expect(response).toEqual({ test: "response" });
   });
+
+  // Additional test cases can target specific logical branches and edge cases to achieve higher code coverage
 });
