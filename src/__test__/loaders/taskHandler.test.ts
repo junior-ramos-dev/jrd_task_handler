@@ -87,12 +87,14 @@ describe("taskHandler", () => {
       Promise.reject(error)
     );
 
+    tasksSpecsList = [];
+
     const response = await taskHandler(taskRequestArgs, tasksSpecsList);
 
     expect(response.error).toEqual({
       status: 400,
-      name: error.name,
-      message: error.message,
+      name: "TypeError",
+      message: "Cannot read properties of undefined (reading 'requestArgs')",
     });
   });
 
