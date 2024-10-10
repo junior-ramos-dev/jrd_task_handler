@@ -21,6 +21,7 @@ let index = 0;
 let runTask = 0;
 
 /**
+ * Execute the list of tasks defined in tasksSpecsList
  *
  * @param taskRequestArgs
  * @param tasksSpecsList
@@ -41,7 +42,6 @@ export const taskHandler: TaskHandler = async (
       executeAllTasksButLast(taskSpecObj, taskArgs);
     } else {
       if (taskId === totalTasks && runTask) {
-        // logTask(taskSpecObj);
         //Execute the last task and return data
       } else if (taskId === totalTasks && !runTask) {
         runTask = 1;
