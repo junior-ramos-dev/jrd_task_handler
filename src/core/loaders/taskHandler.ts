@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Task } from "@/core/modules/Task";
+import { Task } from "../modules/Task";
+import { TaskHandler, TaskRequestArgs } from "../modules/TaskHandler";
 import {
   execTaskBySpecObject,
   getCachedData,
@@ -9,9 +10,7 @@ import {
   logTask,
   setCacheData,
   TASK,
-} from "@/core/modules/TaskHandlerSpecs";
-
-import { TaskHandler, TaskRequestArgs } from "../modules/TaskHandler";
+} from "../modules/TaskHandlerSpecs";
 
 const task: Task = new Task();
 const cachedData: ICacheData[] = [];
