@@ -58,6 +58,7 @@ export const taskHandler: TaskHandler = async (
         index = 0;
         taskId = 1;
         runTask = 0;
+        cachedData.length = 0;
       }
     }
 

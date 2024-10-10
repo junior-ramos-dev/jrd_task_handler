@@ -1,60 +1,105 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * Interface with the task specifications
+ * Interface representing the specifications of a task.
  */
 export interface ITaskHandlerSpecs {
-  // Define the task id
+  /**
+   * A unique identifier for the task.
+   * @type {number}
+   */
   taskId: number;
-  // Define the task name
+
+  /**
+   * The name of the task for reference and logging purposes.
+   * @type {string}
+   */
   taskName: string;
-  // Define the task function
+
+  /**
+   * An asynchronous function representing the task execution.
+   * The function returns a promise, reflecting async operations.
+   * @type {AsyncTask}
+   */
   task: AsyncTask;
-  // Define if the task use args from the initial request
+
+  /**
+   * Optional. Contains the specification for using arguments from the initial request.
+   * @type {IRequestArgs | undefined}
+   */
   requestArgs?: IRequestArgs;
-  // Define if current task uses data returned from the previous task as args
+
+  /**
+   * Optional. Defines usage of data returned from a previous task as arguments for the current task.
+   * @type {IPreviousTaskDataArgs | undefined}
+   */
   prevTaskDataAsArg?: IPreviousTaskDataArgs;
-  // Define if current task return data;
+
+  /**
+   * Optional. Specifies whether the task's return data should be cached for future use.
+   * @type {ITaskReturnData | undefined}
+   */
   taskReturnData?: ITaskReturnData;
 }
 
 /**
- * Define the task function type
+ * Type defining a task function that is asynchronous and returns a promise.
+ * @typedef {(...args: any) => Promise<any>} AsyncTask
  */
 export type AsyncTask = (...args: any) => Promise<any>;
 
 /**
- * Define if the task use args from the initial request
+ * Interface defining the structure for task input arguments extracted from the initial request.
  */
 export interface IRequestArgs {
-  // Define the args keys from initial request
+  /**
+   * An array of keys used to extract arguments from the initial request object.
+   * @type {string[]}
+   */
   requestArgsKeys: string[];
 }
 
 /**
- * Define if current task uses data returned from the previous task as args
+ * Interface defining the structure for using data from a previous task as arguments in the current task.
  */
 export interface IPreviousTaskDataArgs {
-  // Define the id from which previous task data is used by current task
+  /**
+   * The ID of the previous task whose data will be used as input for the current task.
+   * @type {number}
+   */
   prevTaskId: number;
-  // Define the args keys from previous task data
+
+  /**
+   * An array of keys specifying which data from the previous task is used as arguments for the current task.
+   * @type {string[]}
+   */
   prevTaskDataArgs: string[];
 }
 
 /**
- * Define if task return data;
+ * Interface specifying whether a task's return data should be cached for later use by other tasks.
  */
 export interface ITaskReturnData {
-  // Define if the returned data must be cached to use by next tasks;
+  /**
+   * A boolean indicating if the task's return data should be cached.
+   * @type {boolean}
+   */
   cacheData: boolean;
 }
 
 /**
- * Cache the tasks data
+ * Interface representing the cached data from tasks, meant to be accessible for future tasks.
  */
 export interface ICacheData {
-  // Define if task return data;
+  /**
+   * The ID of the task whose data is being cached.
+   * @type {number}
+   */
   taskId: number;
-  // Define if the returned data must be cached to use in next steps;
+
+  /**
+   * The actual data to be cached from the task execution, which can be of any type.
+   * @type {any}
+   */
   data: any;
 }
 

@@ -72,10 +72,9 @@ If an error occurs during task execution, it is caught and logged:
 **Error Handling**:
 - The error is captured, and a response object with a 400 status is returned, detailing the error.
 
-<br/>
 
 ----
-
+<br/>
 
 # Usage with API (Express)
 
@@ -108,7 +107,6 @@ export const taskEndpoint = async (req: Request, res: Response) => {
 };
 ```
 
-
 ## Key Components
 
 ### 1. Sample Endpoint: `taskEndpoint`
@@ -140,21 +138,52 @@ This utility function is likely designed to wrap the core task execution (`taskH
 
 This is an imported list of task specifications (`registerTasksSpecsList`), which outlines what tasks should be executed, in what order, and with what configurations.
 
+
+Structured overview of the properties from Task Specification, outlining their purposes.
+
+| Property          | Type                                      | Description                                                                                   |
+|-------------------|-------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `taskId`          | `number`                                  | A unique identifier for the task.                                                             |
+| `taskName`        | `string`                                  | The name of the task for reference and logging purposes.                                      |
+| `task`            | `AsyncTask`                               | An asynchronous function representing the task execution, returning a promise.                |
+| `requestArgs`     | `IRequestArgs` | Interface defining the structure for task input arguments extracted from the initial request.            |
+| `prevTaskDataAsArg` | `IPreviousTaskDataArgs` | Interface defining the structure for using data from a previous task as arguments in the current task.       | Optional. Defines usage of data returned from a previous task as arguments for the current task.|
+| `taskReturnData`  | `ITaskReturnData` | Interface specifying whether a task's return data should be cached for later use by other tasks.             | Optional. Specifies whether the task's return data should be cached for future use.           |
+
+### IRequestArgs
+
+| Property          | Type              | Description                                                                                  |
+|-------------------|-------------------|----------------------------------------------------------------------------------------------|
+| `requestArgsKeys` | `string[]`        | An array of keys used to extract arguments from the initial request object.                  |
+
+### IPreviousTaskDataArgs
+
+| Property           | Type               | Description                                                                                  |
+|--------------------|--------------------|----------------------------------------------------------------------------------------------|
+| `prevTaskId`       | `number`           | The ID of the previous task whose data will be used as input for the current task.           |
+| `prevTaskDataArgs` | `string[]`         | An array of keys specifying which data from the previous task is used as arguments for the current task. |
+
+### ITaskReturnData
+
+| Property   | Type      | Description                                                                               |
+|------------|-----------|-------------------------------------------------------------------------------------------|
+| `cacheData`| `boolean` | A boolean indicating if the task's return data should be cached for later use by other tasks. |
+
+### ICacheData
+
+| Property | Type  | Description                                                                            |
+|----------|-------|----------------------------------------------------------------------------------------|
+| `taskId` | `number` | The ID of the task whose data is being cached.                                        |
+| `data`   | `any` | The actual data to be cached from the task execution, which can be of any type.         | 
+
 ### 4. `handleResponse`
 
 This function manages how the result of task executions is returned to the client through the HTTP response (`res`). It formats and sends the task handler's outcome back to the requester.
 
-## Example Usage Scenario
+##
 
-1. **Client Request**: A client sends a POST request to this endpoint with a JSON body, e.g., `{ "userId": "12345" }`.
 
-2. **Backend Processing**:
-   - The `taskEndpoint` extracts this data and triggers the taskHandlerWrapper with necessary components.
-   - Tasks are executed as per the steps defined in the `registerTasksSpecsList`, where each task can involve processes like fetching user data, computing metrics, etc.
 
-3. **Result Handling**:
-   - The result of these tasks, whether success or error, is logged to the console.
-   - The final formatted response is sent back to the client, indicating success or detailing any errors encountered.
 
-This setup provides a flexible and organized way to handle complex business logic asynchronously via a sequence of tasks, thereby enabling scalable and maintainable backend processes for handling diverse client requests effectively.
+
 
