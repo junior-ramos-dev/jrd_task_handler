@@ -42,7 +42,7 @@ export const taskHandler: TaskHandler = async (
       executeAllTasksButLast(taskSpecObj, taskArgs);
     } else {
       if (taskId === totalTasks && runTask) {
-        logTask(taskSpecObj);
+        // logTask(taskSpecObj);
         //Execute the last task and return data
       } else if (taskId === totalTasks && !runTask) {
         runTask = 1;
