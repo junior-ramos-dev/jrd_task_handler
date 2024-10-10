@@ -35,7 +35,6 @@ export const taskHandler: TaskHandler = async (
   try {
     const taskSpecObj = getTaskSpecByIndex(tasksSpecsList, index);
     const taskArgs = getTaskArgs(taskSpecObj, taskRequestArgs);
-    console.log("taskArgs: ", taskArgs);
 
     if (taskId < totalTasks) {
       // Execute all tasks except the last one
