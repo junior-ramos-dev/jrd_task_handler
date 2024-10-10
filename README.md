@@ -75,7 +75,7 @@ If an error occurs during task execution, it is caught and logged:
 <br/>
 
 ----
-</br>
+
 
 # Usage with API (Express)
 
@@ -111,7 +111,7 @@ export const taskEndpoint = async (req: Request, res: Response) => {
 
 ## Key Components
 
-### 1. Express.js Endpoint: `taskEndpoint`
+### 1. Sample Endpoint: `taskEndpoint`
 
 The `taskEndpoint` function is an asynchronous function that acts as a handler for an Express.js endpoint, designed to process HTTP requests.
 
