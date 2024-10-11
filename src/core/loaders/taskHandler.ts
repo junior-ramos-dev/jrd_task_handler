@@ -39,18 +39,15 @@ export const taskHandler: TaskHandler = async (
 
     if (taskId < totalTasks) {
       // Execute all tasks except the last one
-      executeAllTasksButLast(taskSpecObj, taskArgs);
+      await executeAllTasksButLast(taskSpecObj, taskArgs);
     } else {
       if (taskId === totalTasks && runTask) {
         //Execute the last task and return data
       } else if (taskId === totalTasks && !runTask) {
         runTask = 1;
-        execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs).then(
-          (data: any) => {
-            task.setData(data);
-            taskId = 8;
-          }
-        );
+        const data = await execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs);
+        task.setData(data);
+        taskId = 8;
       }
 
       // Reset the aux vars
@@ -58,7 +55,6 @@ export const taskHandler: TaskHandler = async (
         index = 0;
         taskId = 1;
         runTask = 0;
-        cachedData.length = 0;
       }
     }
 
@@ -84,15 +80,16 @@ export const taskHandler: TaskHandler = async (
  * @param taskSpecObj
  * @param taskArgs
  */
-const executeAllTasksButLast = (
+const executeAllTasksButLast = async (
   taskSpecObj: ITaskHandlerSpecs,
   taskArgs: any[]
 ) => {
-  if (taskId === taskSpecObj.taskId && runTask) {
-    logTask(taskSpecObj);
-  } else if (taskId === taskSpecObj.taskId && !runTask) {
-    runTask = 1;
-    execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs).then((data) => {
+  try {
+    if (taskId === taskSpecObj.taskId && runTask) {
+      logTask(taskSpecObj);
+    } else if (taskId === taskSpecObj.taskId && !runTask) {
+      runTask = 1;
+      const data = await execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs);
       if (taskSpecObj.taskReturnData?.cacheData) {
         setCacheData(taskSpecObj.taskId, data, cachedData);
       }
@@ -100,7 +97,17 @@ const executeAllTasksButLast = (
       index++;
       taskId++;
       runTask = 0;
-    });
+    }
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      task.error = {
+        status: 400,
+        name: error.name,
+        message: error.message,
+      };
+    }
+    return task.getResponse();
   }
 };
 

@@ -193,7 +193,7 @@ type ExecFunction = <
  * @param args
  * @returns
  */
-export const execTaskBySpecObject: ExecFunction = <
+export const execTaskBySpecObject: ExecFunction = async <
   T extends ITaskHandlerSpecs,
   K extends keyof ItemSpecTaskKey
 >(
@@ -202,6 +202,6 @@ export const execTaskBySpecObject: ExecFunction = <
   ...args: Parameters<GetFunction<T, K>>
 ) => {
   const func = obj[key];
-  const value = func(...args);
+  const value = await func(...args);
   return value;
 };
