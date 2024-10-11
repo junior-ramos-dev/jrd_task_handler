@@ -52,9 +52,7 @@ export const taskHandler: TaskHandler = async (
 
       // Reset the aux vars
       if (index === totalTasks - 1) {
-        index = 0;
-        taskId = 1;
-        runTask = 0;
+        clearAuxVars();
       }
     }
 
@@ -69,6 +67,8 @@ export const taskHandler: TaskHandler = async (
         message: error.message,
       };
     }
+
+    clearAuxVars();
 
     return task.getResponse();
   }
@@ -107,6 +107,9 @@ const executeAllTasksButLast = async (
         message: error.message,
       };
     }
+
+    clearAuxVars();
+
     return task.getResponse();
   }
 };
@@ -185,4 +188,13 @@ const getValueInObjectFromArrayKeys = (obj: object, keys: string[]) => {
 
   //   console.log(values);
   return values;
+};
+
+/**
+ * Reset the aux vars
+ */
+const clearAuxVars = () => {
+  index = 0;
+  taskId = 1;
+  runTask = 0;
 };
