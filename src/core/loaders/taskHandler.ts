@@ -129,7 +129,7 @@ const getTaskArgs = (
   let prevTaskArgs: any[] = [];
 
   if (taskSpecObj.requestArgs) {
-    reqArgs = getValueInObjectFromArrayKeys(
+    reqArgs = findPropertiesByPaths(
       taskRequestArgs,
       taskSpecObj.requestArgs.requestArgsKeys
     );
@@ -140,7 +140,7 @@ const getTaskArgs = (
       taskSpecObj.prevTaskDataAsArg.prevTaskId,
       cachedData
     );
-    prevTaskArgs = getValueInObjectFromArrayKeys(
+    prevTaskArgs = findPropertiesByPaths(
       prevTaskData,
       taskSpecObj.prevTaskDataAsArg.prevTaskDataArgs
     );
@@ -152,42 +152,48 @@ const getTaskArgs = (
 };
 
 /**
- * Iterates over objects (and nested objects)
- * and return the values for the keys in array of strings
+ * Traverses an object based on an array of paths and returns the values of the specified properties.
  *
- * @param obj
- * @param keys
- * @returns
+ * @param obj - The root object in which to search for the properties.
+ * @param propertyPaths - An array of strings, each representing a path to a desired property (e.g., ["property1.property2", "property3"]).
+ * @returns An array containing the values at the specified paths. If a path can't be resolved, its corresponding value will be undefined.
+ *
+ * Example usage:
+ * const myObject = { a: { b: { c: 42 } }, d: 10, e: { f: 50 } };
+ * const paths = ['a.b.c', 'd', 'e.f', 'g.h'];
+ * const values = findPropertiesByPaths(myObject, paths);
+ * console.log('Found Values:', values); // Output: [42, 10, 50, undefined]
  */
-const getValueInObjectFromArrayKeys = (obj: object, keys: string[]) => {
-  const values: any[] = [];
+const findPropertiesByPaths = (
+  obj: Record<string, any>,
+  propertyPaths: string[]
+): any[] => {
+  const results = propertyPaths.map((propertyPath) => {
+    const pathSegments = propertyPath.split(".");
+    let currentValue: any = obj;
 
-  const findValuesInObj = (obj: { [x: string]: any }, k: string) => {
-    Object.keys(obj).forEach((key) => {
-      if (key === k) {
-        values.push(obj[key]);
+    for (const segment of pathSegments) {
+      if (
+        currentValue &&
+        typeof currentValue === "object" &&
+        segment in currentValue
+      ) {
+        currentValue = currentValue[segment]; // Navigate to the next level in the object structure.
+      } else {
+        // console.log(
+        //   `Property path "${propertyPath}" could not be fully resolved.`
+        // );
+        return undefined; // Return undefined if the path can't be fully resolved.
       }
-      if (typeof obj[key] === "object" && obj[key] !== null) {
-        findValuesInObj(obj[key], k);
-      }
-    });
-  };
-
-  let k;
-  keys.forEach((key) => {
-    if (key.indexOf(".") !== -1) {
-      const keysArr = key.split(".");
-      const idx = keysArr.length - 1;
-      k = keysArr[idx];
-    } else {
-      k = key;
     }
-    // console.log(keysArr[idx]);
-    findValuesInObj(obj, k);
+
+    // console.log(
+    //   `Found property at path "${propertyPath}", Value: ${currentValue}`
+    // );
+    return currentValue;
   });
 
-  //   console.log(values);
-  return values;
+  return results;
 };
 
 /**
