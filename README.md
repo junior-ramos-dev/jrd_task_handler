@@ -38,7 +38,10 @@ This helper function handles the execution of tasks except for the final task:
 This function builds the argument list for a task based on the current task's specifications:
 
 - **Task Arguments**: Extracts arguments using specific keys from the `taskRequestArgs`.
-- **Previous Task Data**: If required, retrieves cached data of a previous task to be used as arguments.
+- **Previous Task Data**: If required, retrieves cached data of a previous task to be used as arguments using specific keys from the `prevTaskDataArgs`.
+
+- #### Note
+  - When defining a task's arguments, if you use both `taskRequestArgs` and `prevTaskDataArgs,` the `taskRequestArgs` must be declared first, followed by `prevTaskDataArgs,` and in their respective order, defined in the `tasksSpecsList` object for the given task.
 
 ### 4. `getValueInObjectFromArrayKeys` Function
 
