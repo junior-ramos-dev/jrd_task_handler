@@ -7,7 +7,6 @@ import {
   getTaskSpecByIndex,
   ICacheData,
   ITaskHandlerSpecs,
-  logTask,
   setCacheData,
   TASK,
 } from "../modules/TaskHandlerSpecs";
@@ -19,6 +18,16 @@ const cachedData: ICacheData[] = [];
 let taskId = 1;
 let index = 0;
 let runTask = 0;
+
+/**
+ * Reset the aux vars
+ */
+const clearAuxVars = () => {
+  index = 0;
+  taskId = 1;
+  runTask = 0;
+  cachedData.length = 0;
+};
 
 /**
  * Execute the list of tasks defined in tasksSpecsList
@@ -41,18 +50,19 @@ export const taskHandler: TaskHandler = async (
       // Execute all tasks except the last one
       await executeAllTasksButLast(taskSpecObj, taskArgs);
     } else {
+      // Execute the last task and return data
       if (taskId === totalTasks && runTask) {
-        //Execute the last task and return data
+        // logTask(taskSpecObj);
       } else if (taskId === totalTasks && !runTask) {
         runTask = 1;
         const data = await execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs);
         task.setData(data);
-        taskId = 8;
-      }
-
-      // Reset the aux vars
-      if (index === totalTasks - 1) {
-        clearAuxVars();
+        taskId = totalTasks + 1;
+      } else if (taskId === totalTasks + 1 && runTask) {
+        // Reset the aux vars
+        if (index === totalTasks - 1) {
+          clearAuxVars();
+        }
       }
     }
 
@@ -86,7 +96,7 @@ const executeAllTasksButLast = async (
 ) => {
   try {
     if (taskId === taskSpecObj.taskId && runTask) {
-      logTask(taskSpecObj);
+      // logTask(taskSpecObj);
     } else if (taskId === taskSpecObj.taskId && !runTask) {
       runTask = 1;
       const data = await execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs);
@@ -194,13 +204,4 @@ const findPropertiesByPaths = (
   });
 
   return results;
-};
-
-/**
- * Reset the aux vars
- */
-const clearAuxVars = () => {
-  index = 0;
-  taskId = 1;
-  runTask = 0;
 };
