@@ -1,5 +1,5 @@
 {
-  "name": "jrd_task_loader",
+  "name": "jrd_task_handler",
   "version": "1.0.0",
   "description": "Provides a handler for multi-task requests to the server and returns the response for the client.",
   "main": "./dist/index.js",
