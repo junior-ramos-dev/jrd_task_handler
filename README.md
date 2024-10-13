@@ -7,7 +7,7 @@ This module is designed to handle and execute a sequence of tasks based on provi
 This task handling module is structured to execute tasks efficiently, support dependency management between tasks through caching, and provide essential error handling to ensure robustness. It's a flexible solution adaptable to various sequential task execution scenarios.
 
 ----
-<br/>
+
 
 # Usage with API (Express)
 
@@ -176,7 +176,7 @@ export const getApiCredentials = async () => {
     apiCredentials = { token: "<some token>" };
     setTimeout(() => {
       try {
-        if (apiCredentials) {
+        if (!apiCredentials) {
           throw new Error(
             "An error occurred while getting the API credentials"
           );
