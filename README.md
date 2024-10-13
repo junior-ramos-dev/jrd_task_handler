@@ -6,78 +6,6 @@ This module is designed to handle and execute a sequence of tasks based on provi
 
 This task handling module is structured to execute tasks efficiently, support dependency management between tasks through caching, and provide essential error handling to ensure robustness. It's a flexible solution adaptable to various sequential task execution scenarios.
 
-## Key Components
-
-### 1. `taskHandler` Function
-
-The `taskHandler` function is the main orchestrator that executes a list of tasks. It takes two parameters:
-
-- **`taskRequestArgs`**: An object containing arguments required by tasks.
-- **`tasksSpecsList`**: An array of task specifications, each defining how a task should be executed.
-
-#### Workflow
-
-- **Initialization**: Initialize auxiliary variables like `taskId`, `index`, and `runTask` to manage task sequencing.
-- **Task Execution**:
-  - Uses `getTaskSpecByIndex` to retrieve the current task specification.
-  - Assembles `taskArgs` by calling `getTaskArgs`, which extracts required arguments from `taskRequestArgs` or cached data.
-  - If `taskId` is less than the total tasks, it calls `executeAllTasksButLast`.
-  
-### 2. `executeAllTasksButLast` Function
-
-This helper function handles the execution of tasks except for the final task:
-
-- Verifies if the current task should be logged and is ready to run.
-- Executes the task using `execTaskBySpecObject` and caches its output if needed.
-- Updates the `cachedData`, `index`, `taskId`, and `runTask` flags to progress the task sequence.
-- #### Note:
-   At this point, the response will always include an empty object for `data` and an object for `error` (the properties will be empty if there are no errors) and the ID for the current task being executed. If no errors occur during the process, the final task will return the resulting data.
-
-### 3. `getTaskArgs` Function
-
-This function builds the argument list for a task based on the current task's specifications:
-
-- **Task Arguments**: Extracts arguments using specific keys from the `taskRequestArgs`.
-- **Previous Task Data**: If required, retrieves cached data of a previous task to be used as arguments using specific keys from the `prevTaskDataArgs`.
-
-- #### Note
-  - When defining a task's arguments, if you use both `taskRequestArgs` and `prevTaskDataArgs,` the `taskRequestArgs` must be declared first, followed by `prevTaskDataArgs,` and in their respective order, defined in the `tasksSpecsList` object for the given task.
-
-### 4. `getValueInObjectFromArrayKeys` Function
-
-This utility function searches through an object (including nested objects) to extract values based on provided keys. It returns an array containing the corresponding values found.
-
-## Examples
-
-### Example 1: Basic Task Execution
-
-Suppose you have two tasks to execute. The `taskHandler` would manage running the first task, storing data if required, and then proceeding to the last task, leveraging cached data when necessary.
-
-**Input**:
-```typescript
-const taskRequestArgs = { id: 123 };
-const tasksSpecsList: ITaskHandlerSpecs[] = [
-    { taskId: 1, taskName: "Fetch User", task: fetchUser },
-    { taskId: 2, taskName: "Fetch Orders", task: fetchOrders, prevTaskDataAsArg: { prevTaskId: 1,  prevTaskDataArgs: ['userId'] } }
-];
-```
-
-**Execution Flow**:
-1. The first task, `Fetch User`, is executed using `taskRequestArgs`.
-2. The result of `Fetch User` is cached if necessary.
-3. The second task, `Fetch Orders`, uses the result of the first task as an argument (`userId`), ensuring sequential dependency handling.
-
-### Example 2: Error Handling
-
-If an error occurs during task execution, it is caught and logged:
-
-**Case**:
-- Error happens in fetching user orders.
-  
-**Error Handling**:
-- The error is captured, and a response object with a 400 status is returned, detailing the error.
-
-
 ----
 <br/>
 
@@ -87,6 +15,7 @@ The provided code defines an endpoint for an Express.js application that handles
 
 **Example**:
 ```typescript
+
 import { Request, Response } from "express";
 
 import {
@@ -106,15 +35,13 @@ export const taskEndpoint = async (req: Request, res: Response) => {
     registerTasksSpecsList
   );
 
-  console.log("result:", result);
-
   handleResponse(result, res);
 };
 ```
 
-## Key Components
+## Description
 
-### 1. Sample Endpoint: `taskEndpoint`
+### Sample Endpoint: `taskEndpoint`
 
 The `taskEndpoint` function is an asynchronous function that acts as a handler for an Express.js endpoint, designed to process HTTP requests.
 
@@ -135,14 +62,53 @@ The `taskEndpoint` function is an asynchronous function that acts as a handler f
 - **Response Handling**:
   - Sends back the result to the client using `handleResponse`, adjusting the HTTP response to reflect the task execution outcome.
 
-### 2. `taskHandlerWrapper`
+## Key Components
+
+### 1. `taskHandlerWrapper`
 
 This utility function is likely designed to wrap the core task execution (`taskHandler`) with additional logic, possibly including error handling, logging, or other middleware functionalities. It orchestrates the main task execution process.
 
-### 3. Task Specification: `registerTasksSpecsList`
+### 2. Task Specification: `registerTasksSpecsList`
 
 This is a list of the task specifications (`registerTasksSpecsList`), which outlines what tasks should be executed, in what order, and with what configurations.
 
+#### Example
+
+```typescript
+/**
+ * This is an example of the specifications for each task used by the task loader
+ */
+export const registerTasksSpecsList: Array<ITaskHandlerSpecs> = [
+  {
+    taskId: 1,
+    taskName: "checkEmailExists",
+    task: checkEmailExists,
+    requestArgs: {
+      requestArgsKeys: ["email"],
+    },
+  },
+  {
+    taskId: 2,
+    taskName: "getApiCredentials",
+    task: getApiCredentials,
+    taskReturnData: {
+      cacheData: false,
+    },
+  },
+  {
+    taskId: 3,
+    taskName: "createAccount",
+    task: createAccount,
+    requestArgs: {
+      requestArgsKeys: ["email", "password"],
+    },
+    taskReturnData: {
+      cacheData: true,
+    },
+  },
+  ...
+]
+```
 
 Structured overview of the properties from Task Specification, outlining their purposes.
 
@@ -176,11 +142,55 @@ Structured overview of the properties from Task Specification, outlining their p
 
 ##
 
-### 4. `handleResponse`
+### 3. `handleResponse(result: ITask, res: Response)`
 
-This function is responsible for managing the return of task execution results to the client through the HTTP response (`res`). It formats and sends the outcome of the task handler back to the requester. Since the `taskHandler` function always returns an object with a status code of 400 (indicating an error scenario), it can be replaced with a function that returns a different response based on specific business logic conditions.
+This helper function is responsible for returning the results of task execution to the client via the HTTP response (`res`). It formats and sends the outcome of the task handler back to the requester. In general, the `taskHandler` function is designed to return an object with a status code of 400, indicating an error scenario, which is handled by a try/catch block as described in the following examples. However, you have the flexibility to replace it with a function that returns a different response based on specific business logic conditions.
 
-### Example
+```typescript
+// Task 1 - Check email
+export const checkEmailExists = async (email: string) => {
+  console.log(email);
+  let emailExists: boolean = false;
+
+  return new Promise((resolve, reject) => {
+    emailExists = false;
+    // Simulate an asynchronous operation
+    setTimeout(() => {
+      try {
+        if (emailExists) {
+          throw new Error("An account with the provided email already exists");
+        }
+        resolve(emailExists);
+      } catch (error) {
+        reject(error);
+      }
+    }, 1000);
+  });
+};
+
+// Task 2 - Get API credentials
+export const getApiCredentials = async () => {
+  let apiCredentials: unknown = undefined;
+
+  return new Promise((resolve, reject) => {
+    apiCredentials = { token: "<some token>" };
+    setTimeout(() => {
+      try {
+        if (apiCredentials) {
+          throw new Error(
+            "An error occurred while getting the API credentials"
+          );
+        }
+        resolve(apiCredentials);
+      } catch (error) {
+        reject(error);
+      }
+    }, 2000);
+  });
+};
+```
+
+### Implementing a different response handler
 
 Assume you need to send a redirect response. We will create the `convertToRedirectError` function and modify it accordingly. HTTP 300 codes are used for redirection, which usually implies that further action needs to be taken to complete the request.
 
@@ -233,10 +243,10 @@ const taskResponse: ITask = {
     name: "BadRequest",
     message: "Invalid request.",
   },
-  taskId: 3,
+  taskId: 2,
 };
 
-if(taskResponse.taskId === 3)
+if(taskResponse.taskId === 2)
   convertToRedirectError(taskResponse, res);
 
 ```
