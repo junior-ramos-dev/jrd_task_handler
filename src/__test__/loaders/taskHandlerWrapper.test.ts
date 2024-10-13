@@ -3,7 +3,7 @@ import { Response } from "express";
 import {
   handleResponse,
   taskHandlerWrapper,
-} from "../../core/loaders/taskHandlerWrapper";
+} from "../../core/loaders/TaskHandlerWrapper";
 import { ITaskHandlerSpecs } from "../../core/modules/TaskHandlerSpecs";
 
 describe("taskHandlerWrapper", () => {

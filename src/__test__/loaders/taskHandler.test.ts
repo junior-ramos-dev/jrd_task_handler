@@ -1,4 +1,4 @@
-import { taskHandler } from "../../core/loaders/taskHandler";
+import { taskHandler } from "../../core/loaders/TaskHandler";
 import { TaskRequestArgs } from "../../core/modules/TaskHandler";
 import {
   execTaskBySpecObject,
@@ -8,8 +8,6 @@ import {
   logTask,
   setCacheData,
 } from "../../core/modules/TaskHandlerSpecs";
-
-import "@types/jest";
 
 // Mocking the dependencies
 jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
