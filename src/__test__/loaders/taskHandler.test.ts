@@ -4,10 +4,17 @@ import {
   execTaskBySpecObject,
   getCachedData,
   getTaskSpecByIndex,
+  ICacheData,
   ITaskHandlerSpecs,
   logTask,
   setCacheData,
 } from "../../core/modules/TaskHandlerSpecs";
+
+// File-scoped auxiliary variables
+let taskId = 1;
+let index = 0;
+let runTask = 0;
+const cachedData: ICacheData[] = [];
 
 // Mocking the dependencies
 jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
@@ -16,16 +23,23 @@ jest.mock("../../core/modules/TaskHandlerSpecs", () => ({
   getTaskSpecByIndex: jest.fn(),
   logTask: jest.fn(),
   setCacheData: jest.fn(),
+  clearAuxVars: jest.fn(),
   TASK: {},
 }));
 
 describe("taskHandler", () => {
   let taskRequestArgs: TaskRequestArgs;
   let tasksSpecsList: ITaskHandlerSpecs[];
+  let clearAuxVarsMock: jest.Mock;
 
   beforeEach(() => {
     // Reset mock implementations
     jest.clearAllMocks();
+
+    // Reset file-scoped auxiliary variables before each test
+    taskId = 1;
+    index = 0;
+    runTask = 0;
 
     // Sample task specs list
     tasksSpecsList = [
@@ -45,6 +59,13 @@ describe("taskHandler", () => {
     // Sample task request args
     taskRequestArgs = { key1: "value1", key2: "value2" };
 
+    clearAuxVarsMock = jest.fn(() => {
+      index = 0;
+      taskId = 1;
+      runTask = 0;
+      cachedData.length = 0;
+    });
+
     // Default mock return values
     const defaultMockAsyncImplementation = jest.fn(() =>
       Promise.resolve("data")
@@ -56,6 +77,10 @@ describe("taskHandler", () => {
       (list, index) => list[index]
     );
     (getCachedData as jest.Mock).mockReturnValue("cachedData");
+  });
+
+  afterEach(() => {
+    clearAuxVarsMock.mockRestore();
   });
 
   it("should execute all tasks except the last one correctly", async () => {
@@ -99,5 +124,26 @@ describe("taskHandler", () => {
     });
   });
 
-  // Additional test cases can target specific logical branches and edge cases to achieve higher code coverage
+  it("should reset auxiliary variables when the last task is completed", async () => {
+    await taskHandler(taskRequestArgs, tasksSpecsList);
+
+    // Manually simulate the state to trigger clearAuxVars
+    taskId = 3;
+    index = 1;
+    runTask = 1;
+
+    // Execute the handler again to ensure aux variables are cleared
+    await taskHandler(taskRequestArgs, tasksSpecsList);
+
+    expect(clearAuxVarsMock).toHaveBeenCalled();
+
+    // Verify state resets
+    expect(taskId).toBe(1);
+    expect(index).toBe(0);
+    expect(runTask).toBe(0);
+    expect(cachedData).toHaveLength(0);
+
+    // Ensure no further task executions occur post-reset
+    expect(execTaskBySpecObject).toHaveBeenCalledTimes(1);
+  });
 });
