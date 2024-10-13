@@ -27,15 +27,39 @@ export const taskHandlerWrapper: TaskHandlerWrapper = async (
   return response;
 };
 
+/**
+ * Helper function to handle the response from taskHandler
+ *
+ * @param result
+ * @param res
+ * @returns
+ */
 export const handleResponse = (result: ITask | undefined, res: Response) => {
+  // Check if the result is defined
   if (result) {
-    const response: ITask = result;
-    if (response && !response.data && "taskId" in response) {
-      res.status(200).json(response);
-    } else if (response?.error && response?.error.status > 0) {
-      res.status(response.error.status).json(response.error);
-    } else if (response?.data) {
-      res.status(200).json(response);
+    // Destructure the result for convenient access
+    const { data, error, taskId } = result;
+
+    // Handle the scenario where the taskId is defined but no data is available
+    if (!data && taskId) {
+      // Log the condition and send a successful response with the result object
+      console.log(
+        `Task ${taskId} executed successfully, but no data was returned.`
+      );
+      return res.status(200).json(result);
+    }
+
+    // Handle the scenario where there is an error present in the response
+    if (error && error.status > 0) {
+      console.error(`Error occurred while processing task: ${error.message}`);
+      // Send response status as per the error object
+      return res.status(error.status).json(error);
+    }
+
+    // Handle case when data is present
+    if (data) {
+      console.log(`Task ${taskId} executed successfully.`);
+      return res.status(200).json(result);
     }
   }
 };
