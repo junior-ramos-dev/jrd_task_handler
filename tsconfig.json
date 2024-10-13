@@ -17,10 +17,11 @@
     "transpileOnly": true,
     "require": ["tsconfig-paths/register"]
   },
+  "types": ["jest", "node"],
   "exclude": [
     "node_modules",
     "./dist/**/*", 
-    "./src/**/*.test.ts",
+    // "./src/**/*.test.ts",
     "./*.config.ts",
   ],
 }
