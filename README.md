@@ -178,7 +178,68 @@ Structured overview of the properties from Task Specification, outlining their p
 
 ### 4. `handleResponse`
 
-This function manages how the result of task executions is returned to the client through the HTTP response (`res`). It formats and sends the task handler's outcome back to the requester.
+This function is responsible for managing the return of task execution results to the client through the HTTP response (`res`). It formats and sends the outcome of the task handler back to the requester. Since the `taskHandler` function always returns an object with a status code of 400 (indicating an error scenario), it can be replaced with a function that returns a different response based on specific business logic conditions.
+
+### Example
+
+Assume you need to send a redirect response. We will create the `convertToRedirectError` function and modify it accordingly. HTTP 300 codes are used for redirection, which usually implies that further action needs to be taken to complete the request.
+
+Here's how you might implement this function in TypeScript:
+
+```typescript
+import { Response } from 'express'; // Import Response type for Express
+
+// Assume the following specified interface for ITask
+interface ITask {
+  data?: object;
+  error: ITaskError;
+  taskId: number;
+}
+
+// Assume the ITaskError specified interface for ITaskError:
+interface ITaskError {
+  status: number;   // HTTP status code
+  name: string;     // Name/type of the error
+  message: string;  // Detailed message describing the error
+}
+
+/**
+ * Converts an ITask object into an error response with an HTTP 300 status code
+ * and sends it to the client.
+ *
+ * @param {ITask} task - The task object to convert into an error response.
+ * @param {Response} res - The Express Response object used to send the error.
+ */
+const convertToRedirectError = (task: ITask, res: Response): void => {
+  // Extract properties from the task object
+  const { taskId } = task;
+
+  // Construct redirect error response
+  const redirectError: ITaskError = {
+    status: 307, // Temporary Redirect (you can choose any 3xx code as needed)
+    name: "RedirectError",
+    message: `Task ${taskId} requires further action. Please redirect accordingly.`,
+  };
+
+  // Send the constructed error response to the client
+  res.status(redirectError.status).json(redirectError);
+};
+
+// Example usage assuming the following task response with default error status code 400: 
+const taskResponse: ITask = {
+  data: {},
+  error: {
+    status: 400,
+    name: "BadRequest",
+    message: "Invalid request.",
+  },
+  taskId: 3,
+};
+
+if(taskResponse.taskId === 3)
+  convertToRedirectError(taskResponse, res);
+
+```
 
 ##
 
