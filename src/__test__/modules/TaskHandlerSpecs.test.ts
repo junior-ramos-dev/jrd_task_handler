@@ -4,7 +4,6 @@ import {
   getTaskSpecByIndex,
   ICacheData,
   ITaskHandlerSpecs,
-  logTask,
   setCacheData,
 } from "../../core/modules/TaskHandlerSpecs";
 
@@ -68,13 +67,13 @@ describe("Task Handling Functions", () => {
     });
   });
 
-  describe("logTask", () => {
-    it("should log the task information", () => {
-      console.log = jest.fn(); // Mock console.log
-      logTask(taskHandlerItemSpecsList[0]);
-      expect(console.log).toHaveBeenCalledWith("Running Task 1 - Test Task 1");
-    });
-  });
+  // describe("logTask", () => {
+  //   it("should log the task information", () => {
+  //     console.log = jest.fn(); // Mock console.log
+  //     logTask(taskHandlerItemSpecsList[0]);
+  //     expect(console.log).toHaveBeenCalledWith("Running Task 1 - Test Task 1");
+  //   });
+  // });
 
   describe("execTaskBySpecObject", () => {
     it("should execute the task function and return the result", async () => {

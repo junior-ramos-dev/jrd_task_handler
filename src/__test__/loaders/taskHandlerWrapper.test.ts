@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { ITask } from "src/core/modules/Task";
 
 import {
   handleResponse,
@@ -37,59 +38,66 @@ describe("taskHandlerWrapper", () => {
   });
 });
 
+// Mock the Response object from express
+const mockResponse = () => {
+  const res = {} as Response;
+  res.status = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
+  return res;
+};
+
 describe("handleResponse", () => {
-  let mockResponse: Response;
+  let res: Response;
 
   beforeEach(() => {
-    mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    } as unknown as Response;
+    res = mockResponse();
   });
 
-  it("should return status 200 for a response with taskId", () => {
-    const result = {
+  it("should respond when taskId is defined but no data is available", () => {
+    const result: ITask = {
       data: {},
-      error: { status: 0, name: "", message: "" },
+      error: { status: 0, name: "", message: "" }, // No error
       taskId: 1,
     };
 
-    handleResponse(result, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(200);
-    expect(mockResponse.json).toHaveBeenCalledWith(result);
+    handleResponse(result, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(result);
   });
 
-  it("should return the error status when there is an error", () => {
-    const result = {
+  it("should handle and respond properly when an error is present in the response", () => {
+    const result: ITask = {
       data: {},
-      error: { status: 400, name: "Error", message: "Not found" },
-      taskId: 1,
+      error: {
+        status: 500,
+        name: "ServerError",
+        message: "Something went wrong",
+      },
+      taskId: 2,
     };
 
-    handleResponse(result, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(400);
-    expect(mockResponse.json).toHaveBeenCalledWith(result.error);
+    handleResponse(result, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(result.error);
   });
 
-  it("should return status 200 for a response with data", () => {
-    const result = {
-      data: { id: "123" },
-      error: { status: 0, name: "", message: "" },
-      taskId: 1,
+  it("should respond when data is present", () => {
+    const result: ITask = {
+      data: { key: "value" },
+      error: { status: 0, name: "", message: "" }, // No error
+      taskId: 3,
     };
 
-    handleResponse(result, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(200);
-    expect(mockResponse.json).toHaveBeenCalledWith(result);
+    handleResponse(result, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(result);
   });
 
-  it("should not call response methods when result is undefined", () => {
-    handleResponse(undefined, mockResponse);
+  it("should not respond if result is undefined", () => {
+    const result: ITask | undefined = undefined;
 
-    expect(mockResponse.status).not.toHaveBeenCalled();
-    expect(mockResponse.json).not.toHaveBeenCalled();
+    handleResponse(result, res);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
   });
 });
