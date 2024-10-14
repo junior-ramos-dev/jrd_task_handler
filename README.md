@@ -56,9 +56,6 @@ The `taskEndpoint` function is an asynchronous function that acts as a handler f
     - `requestArgs`: The arguments extracted from the incoming HTTP request.
     - `registerTasksSpecsList`: A list of task specifications defining what tasks to run and their configurations.
 
-- **Logging**:
-  - Outputs the task result to the server console for debugging or info purposes.
-
 - **Response Handling**:
   - Sends back the result to the client using `handleResponse`, adjusting the HTTP response to reflect the task execution outcome.
 
