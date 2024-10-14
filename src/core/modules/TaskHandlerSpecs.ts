@@ -148,14 +148,6 @@ export const setCacheData = (
   cacheData.push(cacheObj);
 };
 
-/**
- *
- * @param taskSpec
- */
-export const logTask = (taskSpec: ITaskHandlerSpecs) => {
-  console.log(`Running Task ${taskSpec.taskId} - ${taskSpec.taskName}`);
-};
-
 //================================================================
 
 export const TASK = "task";
