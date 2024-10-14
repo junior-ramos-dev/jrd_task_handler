@@ -52,7 +52,7 @@ export const taskHandler: TaskHandler = async (
     } else {
       // Execute the last task and return data
       if (taskId === totalTasks && runTask) {
-        // logTask(taskSpecObj);
+        // Wait the current task finish
       } else if (taskId === totalTasks && !runTask) {
         runTask = 1;
         const data = await execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs);
@@ -70,13 +70,12 @@ export const taskHandler: TaskHandler = async (
     return task.getResponse();
   } catch (error) {
     console.log(error);
-    if (error instanceof Error) {
-      task.error = {
-        status: 400,
-        name: error.name,
-        message: error.message,
-      };
-    }
+    const errorInstance = error as Error;
+    task.error = {
+      status: 400,
+      name: errorInstance.name,
+      message: errorInstance.message,
+    };
 
     clearAuxVars();
 
@@ -96,7 +95,7 @@ const executeAllTasksButLast = async (
 ) => {
   try {
     if (taskId === taskSpecObj.taskId && runTask) {
-      // logTask(taskSpecObj);
+      // Wait the current task finish
     } else if (taskId === taskSpecObj.taskId && !runTask) {
       runTask = 1;
       const data = await execTaskBySpecObject(taskSpecObj, TASK, ...taskArgs);
@@ -109,18 +108,9 @@ const executeAllTasksButLast = async (
       runTask = 0;
     }
   } catch (error) {
-    console.log(error);
     if (error instanceof Error) {
-      task.error = {
-        status: 400,
-        name: error.name,
-        message: error.message,
-      };
+      throw error;
     }
-
-    clearAuxVars();
-
-    return task.getResponse();
   }
 };
 
