@@ -6,6 +6,11 @@ This module is designed to handle and execute a sequence of tasks based on provi
 
 This task handling module is structured to execute tasks efficiently, support dependency management between tasks through caching, and provide essential error handling to ensure robustness. It's a flexible solution adaptable to various sequential task execution scenarios.
 
+
+```
+npm i jrd_task_handler
+```
+
 ----
 
 
