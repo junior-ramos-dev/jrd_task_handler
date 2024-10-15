@@ -1,5 +1,10 @@
 # Task Handler
 
+- Check a simple use case project [clicking here](https://github.com/junior-ramos-dev/jrd_task_handler_test)
+  
+- Check a real use case example [clicking here](https://github.com/junior-ramos-dev/psn_api_server)
+
+
 ## Overview
 
 This module is designed to handle and execute a sequence of tasks based on provided specifications. It orchestrates the task execution process, handling tasks one after another, and making use of cached data when necessary.
